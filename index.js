@@ -21,7 +21,7 @@ module.exports = function(source) {
     resolve(null, `\
 const parser = new DOMParser();
 const xmlDocument = parser.parseFromString(${JSON.stringify(min.data)}, "image/svg+xml");
-const doc_p = SavageDOM.Context.contexts.take(1).toPromise().then((context) => {
+const doc_p = SavageDOM.Context.contexts.pipe(rxjs.operators.take(1)).toPromise().then((context) => {
   return new SavageDOM.SVGDocument(context, xmlDocument);
 });
 module.exports = class extends SavageDOM.Elements.Renderables.Component {
