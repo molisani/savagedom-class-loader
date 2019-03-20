@@ -1,6 +1,6 @@
 {
   "name": "savagedom-class-loader",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Webpack loader to inline SVG files as SavageDOM classes",
   "main": "index.js",
   "repository": {

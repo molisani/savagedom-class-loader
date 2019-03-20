@@ -14,25 +14,28 @@ const svgo = new SVGO({
   floatPrecision: 2,
 });
 
+function parseQuery(query) {
+  if (!query) {
+    return {};
+  }
+  return JSON.parse(`{"${decodeURI(query.substring(1)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"')}"}`);
+}
+
 module.exports = function(source) {
   const resolve = this.async();
+
+  const options = parseQuery(this.resourceQuery);
+  options.x = options.x || 0;
+  options.y = options.y || 0;
 
   svgo.optimize(source).then((min) => {
     resolve(null, `\
 const parser = new DOMParser();
 const xmlDocument = parser.parseFromString(${JSON.stringify(min.data)}, "image/svg+xml");
-const doc_p = SavageDOM.Context.contexts.pipe(rxjs.operators.take(1)).toPromise().then((context) => {
-  return new SavageDOM.SVGDocument(context, xmlDocument);
-});
 module.exports = class extends SavageDOM.Elements.Renderables.Component {
   constructor() {
-    super({ x: 0, y: 0 });
-    this.loaded = doc_p.then((doc) => {
-      doc.children.forEach((child) => {
-        const importedNode = this.context.window.document.importNode(child, true);
-        this.add(importedNode);
-      });
-    });
+    super({ x: ${options.x}, y: ${options.y} });
+    this.injectDocument(xmlDocument);
   }
 }`);
   });
